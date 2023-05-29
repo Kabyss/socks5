@@ -226,6 +226,29 @@ elif [ "$ID $VERSION_CODENAME" = "debian buster" ]; then
 	echo "User: $USER"
 	echo "Password: $PASSWORD"
 
+# Debian 11 Bullseye
+elif [ "$ID $VERSION_CODENAME" = "debian bullseye" ]; then
+
+	apt update
+	apt install -y dante-server libpam-pwdfile openssl
+
+	generate_password_file /etc/danted.passwd "$USER" "$PASSWORD"
+
+	generate_pam /etc/pam.d/sockd /etc/danted.passwd
+
+	generate_config_v14 /etc/danted.conf "$IFACE" "$PORT"
+
+	open_ufw_port "$PORT"
+
+	systemctl restart danted.service
+
+	echo "Your socks proxy configuration:"
+	echo "Address: $( get_external_address )"
+	echo "Port: $PORT"
+	echo "User: $USER"
+	echo "Password: $PASSWORD"
+
+
 # CentOS 7 and Oracle Linux 7.5
 elif [ "$ID $VERSION_ID" = "ol 7.5" -o "$ID $VERSION_ID" = "centos 7" ]; then
 
